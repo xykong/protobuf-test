@@ -167,7 +167,7 @@ System.out.println("----debug info: start run");
 	    }
         // handle protobuf input object
         if(protobufClassArr!=null && protobufClassArr[0]!=null && !"".equals(protobufClassArr[0])){
-        	//TODO find protobuf class, then init it with paramMap, then transfer protobuf object to byteArray
+        	//find protobuf class, then init it with paramMap, then transfer protobuf object to byteArray
         	// and put all non-protobuf fields into new parameter map
         	String param_key = null;
         	try {

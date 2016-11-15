@@ -4,8 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,7 @@ public class HttpClientRequest {
 		if(RequestMethod_GET.equalsIgnoreCase(requestMethod)){
 			// if requestMap is not empty, add all the parameters into url
 			if(requestMap!=null && !requestMap.isEmpty()){
-				url = concatMapParam(url, requestMap);
+				url = concatMapParamCookie(url, requestMap, localContext, domain);
 			}
 			httprequest = new HttpGet(url);
 		}else if(RequestMethod_POST.equalsIgnoreCase(requestMethod)){
@@ -67,7 +69,7 @@ public class HttpClientRequest {
 				    postrequest.setEntity(new UrlEncodedFormEntity(nvps));
 				}
 			}else {
-				url = concatMapParam(url, requestMap);
+				url = concatMapParamCookie(url, requestMap, localContext, domain);
 				postrequest.addHeader("Content-Type", "application/octet-stream;charset=utf-8");  
 				postrequest.setEntity(new ByteArrayEntity(byteArray));   
 			}
@@ -163,16 +165,30 @@ public class HttpClientRequest {
 		
 	}
 	
-	private static String concatMapParam(String url, Map<String, String> requestMap){
+	private static String concatMapParamCookie(String url, Map<String, String> requestMap, HttpContext localContext, String domain){
 		if(requestMap!=null && !requestMap.isEmpty()){
 			StringBuffer buffer = new StringBuffer();
+			String cookieKey = null;
 		    for(Map.Entry<String, String> entry : requestMap.entrySet()){
-		    	buffer.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+		    	cookieKey = getCookieKey(entry.getKey());
+		    	if(cookieKey!=null){
+		    		addCookie(localContext, cookieKey, entry.getValue(), domain);
+		    	}else {
+		    		buffer.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+		    	}
 		    }
-		    if(url.endsWith("?")||url.endsWith("&")){
-		    	url = url + buffer.substring(0, buffer.length()-1);
+		    String paramStr = "";
+		    if(paramStr.length()>1){
+		    	paramStr = buffer.substring(0, buffer.length()-1);
+		    	paramStr = urlEncode(paramStr);
+		    }
+		    
+		    if(url.indexOf("?")!=-1){
+		    	url = url + "&" + paramStr;
+		    }else if(url.endsWith("&")){
+		    	url = url + paramStr;
 		    }else {
-		    	url = url + "?"+buffer.substring(0, buffer.length()-1);
+		    	url = url + "?" + paramStr;
 		    }
 		}
 		return url;
@@ -225,5 +241,17 @@ public class HttpClientRequest {
 		    localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 		}
 	}
+	
+	private static String urlEncode(String s) {
+        if (s == null) return "";
+
+        try {
+            String encoded = URLEncoder.encode(s, "UTF-8")
+                    .replace("+", "%20").replace("*", "%2A");
+            return encoded;
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 	
 }

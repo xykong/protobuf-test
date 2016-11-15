@@ -152,7 +152,9 @@ System.out.println("----debug info: start run");
         String paramKey = null;
         while(itetor.hasNext()){
         	paramKey = itetor.next();
-        	paramMap.put(paramKey, context.getParameter(paramKey));
+        	if(!"URL".equals(paramKey)&&!"actionMethod".equals(paramKey)){
+        	    paramMap.put(paramKey, context.getParameter(paramKey));
+        	}
         }
         
         

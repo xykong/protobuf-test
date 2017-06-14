@@ -21,3 +21,7 @@ By using this project, you can write protobuf api testing case just like the oth
    b. if the request parameter is a cookie key/value, please use this format: cookie[key]=aabbcc
    c. for normal request parameter, just use them like normal Jmeter Http Request.
 6. you can add any assert for the response just like Http Request
+
+#Notes:
+
+1. when generated protobuf java file, please not add: option optimize_for = LITE_RUNTIME;  --- this will lose the ability of reflection, so protobuf-java cannot work.

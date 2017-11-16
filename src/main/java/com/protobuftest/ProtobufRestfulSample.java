@@ -138,7 +138,6 @@ public class ProtobufRestfulSample extends AbstractJavaSamplerClient implements 
  
     @Override
     public SampleResult runTest(JavaSamplerContext context) {
-System.out.println("----debug info: start run");
         // pull parameters
         String url = context.getParameter( "URL" );
         String actionMethod = context.getParameter( "actionMethod" );
@@ -180,7 +179,7 @@ System.out.println("----debug info: start run");
 	    			param_key = entry.getKey();
 	    			if(param_key.startsWith(Parameter_Protobuf_Prefix)){
 	    				if(param_key.length()>Parameter_Protobuf_Prefix.length()){
-	    					setFieldValue(builderClass, obj, param_key.substring(param_key.indexOf(Parameter_Protobuf_Prefix+1)), entry.getValue());
+	    					setFieldValue(builderClass, obj, param_key.substring(Parameter_Protobuf_Prefix.length()), entry.getValue());
 	    				}
 	    			}else {
 	    				nonProtoParamMap.put(param_key, entry.getValue());
@@ -198,7 +197,6 @@ System.out.println("----debug info: start run");
      
         SampleResult result = new SampleResult();
         result.sampleStart(); // start stopwatch
-System.out.println("----debug info: begin to call");        
         try {
         	HttpClientRequest.ResponseResult responseResult = HttpClientRequest.request(url, actionMethod, nonProtoParamMap, byteArray);
             //

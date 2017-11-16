@@ -46,6 +46,7 @@ public class HttpClientRequest {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpRequestBase httprequest = null;
 		HttpContext localContext = new BasicHttpContext();
+		
 		if(RequestMethod_GET.equalsIgnoreCase(requestMethod)){
 			// if requestMap is not empty, add all the parameters into url
 			if(requestMap!=null && !requestMap.isEmpty()){
@@ -75,6 +76,17 @@ public class HttpClientRequest {
 			}
 			
 			httprequest = postrequest;
+		}
+		
+		// add Header parameters
+		String headerItemKey;
+		if(requestMap!=null && !requestMap.isEmpty()){
+			for(Map.Entry<String, String> entry : requestMap.entrySet()){
+				headerItemKey = getHeaderKey(entry.getKey());
+		    	if(headerItemKey!=null){
+		    		httprequest.addHeader(headerItemKey, entry.getValue());
+		    	}
+		    }
 		}
 		
 		CloseableHttpResponse response = httpclient.execute(httprequest, localContext);
@@ -215,16 +227,27 @@ public class HttpClientRequest {
 //		System.out.println(getCookieKey("Cookie[name]"));
 //	}
 	
-	// if has cookie format, then return key, if key is empty, then return null
-	// the cookie parameter like this: cookie[key]=aabbcc
-	private static String getCookieKey(String parameter){
+	private static String getCustomizedKey(String parameter, String type){
+		if(parameter==null || parameter.trim().length()<1 || type==null || type.trim().length()<1){
+			return null;
+		}
 		String key = null;
-		Pattern p = Pattern.compile("(Cookie|cookie)\\[(.+)?\\]",Pattern.CASE_INSENSITIVE);
+		Pattern p = Pattern.compile("("+type+")\\[(.+)?\\]",Pattern.CASE_INSENSITIVE);
 		Matcher matcher = p.matcher(parameter);
 		if(matcher.find()){
 			key = matcher.group(2);
 		}
 		return key;
+	}
+	
+	// if has cookie format, then return key, if key is empty, then return null
+	// the cookie parameter like this: cookie[key]=aabbcc
+	private static String getCookieKey(String parameter){
+		return getCustomizedKey(parameter, "Cookie|cookie");
+	}
+	
+	private static String getHeaderKey(String parameter){
+		return getCustomizedKey(parameter, "Header|header");
 	}
 	
 	private static void addCookie(HttpContext localContext, String key, String value, String domain){

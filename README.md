@@ -25,3 +25,10 @@ By using this project, you can write protobuf api testing case just like the oth
 #Notes:
 
 1. when generated protobuf java file, please not add: option optimize_for = LITE_RUNTIME;  --- this will lose the ability of reflection, so protobuf-java cannot work.
+
+
+below is my Jmeter case demo snapshot:
+
+![Image text](https://user-images.githubusercontent.com/3772321/34385228-338aafb6-eb5c-11e7-8fd9-f88a5d22e9fe.png)
+
+![Image text](https://user-images.githubusercontent.com/3772321/34385229-33c3a0e6-eb5c-11e7-835e-dd790d816cf2.png)
